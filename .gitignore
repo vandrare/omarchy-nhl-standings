@@ -1,0 +1,9 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.env.*
+notifications.json
+notifications.pre-multiple.json
+email-log.json
+*.log

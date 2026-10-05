@@ -1,0 +1,12 @@
+[Unit]
+Description=Send NHL game result email notifications
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 %h/.config/omarchy/plugins/local.nhl-standings/notifications.py check
+Environment=PYTHONDONTWRITEBYTECODE=1
+TimeoutStartSec=180
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes

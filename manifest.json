@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "local.nhl-standings",
+  "name": "NHL Standings",
+  "version": "1.2.0",
+  "author": "Scott (vandrare)",
+  "description": "Division standings, upcoming games, and optional game result emails",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "NHL Standings",
+    "description": "Western and Eastern standings with upcoming games",
+    "category": "Info",
+    "allowMultiple": false,
+    "defaultSection": "left"
+  }
+}
