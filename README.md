@@ -133,6 +133,8 @@ Settings → Add recipient / team creates another subscription. Each row has its
 own recipient, team, on/off switch, test button, and delivery status. The same
 address can follow several teams using separate rows. Duplicate address/team
 pairs are rejected. Save settings before testing; new rows start switched off.
+The team picker opens above or below its field to fit inside the settings
+viewport. Scroll the list (or use Up/Down and Enter) to reach all teams.
 All rows share the sender, display name, and app password stored in the keyring.
 Tests and live emails use the same latest-game recap and next-game information.
 

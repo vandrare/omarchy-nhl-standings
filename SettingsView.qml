@@ -256,7 +256,8 @@ Item {
                             Layout.preferredWidth: parent.width * 0.32
                             spacing: Style.space(6)
                             Text { text: "Team"; color: Color.foreground; font.family: Style.font.family; font.pixelSize: Style.space(12) }
-                            Ui.Dropdown {
+                            TeamDropdown {
+                                boundaryItem: scroll
                                 width: parent.width
                                 showLabel: false
                                 options: root.teamOptions
