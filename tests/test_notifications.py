@@ -150,7 +150,7 @@ class NotificationsTests(unittest.TestCase):
         with patch.object(n, "season", return_value=[future, latest, older]), patch.object(n, "fetch", return_value={}) as fetch, patch.object(n, "send_email") as send:
             result = n.test_email()
             self.assertTrue(result["ok"])
-            fetch.assert_called_once_with("gamecenter/2/landing")
+            self.assertEqual([call.args[0] for call in fetch.call_args_list], ["gamecenter/2/landing", "standings/now"])
             self.assertEqual(send.call_args.args[1], "Canucks win 4–1")
         self.assertEqual(before, (n.STATE / "notifications.json").read_text())
 

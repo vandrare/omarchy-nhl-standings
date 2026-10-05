@@ -86,7 +86,11 @@ in the masked Settings field. The normal Google account password is not used.
 
 Save settings, then click **Send test email** to send the selected team's
 latest completed-game recap using the same subject and summary as automatic
-notifications. Both include the next scheduled matchup, local date and time,
+notifications. Both include the selected team’s current wins, losses, overtime losses, points,
+games played, and division/conference positions between the recap and next game.
+The standings date is shown because NHL standings may take time to update after
+a final result; an unavailable feed is labeled without blocking the email.
+Both include the next scheduled matchup, local date and time,
 and venue immediately above the NHL game link. This works while notifications are off and does not change
 automatic delivery history. Test emails are sent only when this button is
 clicked. Enable notifications and save to

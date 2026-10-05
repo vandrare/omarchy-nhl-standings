@@ -19,7 +19,7 @@ import time
 import urllib.request
 import uuid
 
-from nhl import BASE, label, next_game
+from nhl import BASE, label, next_game, standings
 
 CONFIG = Path(os.environ.get("XDG_CONFIG_HOME", str(Path.home() / ".config"))) / "nhl-standings"
 STATE = Path(os.environ.get("XDG_STATE_HOME", str(Path.home() / ".local/state"))) / "nhl-standings"
@@ -227,7 +227,7 @@ def team_name(team):
     return " ".join(filter(None, [label(team.get("placeName")), label(team.get("commonName"))])) or team.get("abbrev", "Team")
 
 
-def recap(game, team, landing=None, upcoming=None):
+def recap(game, team, landing=None, upcoming=None, standing=None):
     home = game["homeTeam"]
     away = game["awayTeam"]
     ours, opponent = (home, away) if home["abbrev"] == team else (away, home)
@@ -259,6 +259,19 @@ def recap(game, team, landing=None, upcoming=None):
     venue = label(game.get("venue"))
     if venue:
         summary += "\nVenue: " + venue + "."
+    summary += "\n\nCurrent standings"
+    if standing:
+        summary += " (as of " + standing["date"] + ")" if standing.get("date") else ""
+        summary += f":\n{standing['w']} wins · {standing['l']} losses · {standing['ot']} overtime losses · {standing['pts']} points · {standing['gp']} games played."
+        positions = []
+        if standing.get("division") and standing.get("divisionRank", 0) > 0:
+            positions.append(f"{standing['division']} Division: #{standing['divisionRank']}")
+        if standing.get("conference") and standing.get("rank", 0) > 0:
+            positions.append(f"{standing['conference']} Conference: #{standing['rank']}")
+        if positions:
+            summary += "\n" + " · ".join(positions) + "."
+    else:
+        summary += ": Temporarily unavailable."
     if upcoming:
         start = dt.datetime.fromisoformat(upcoming["start"]).astimezone()
         when = start.strftime("%a, %b %-d, %Y")
@@ -279,7 +292,13 @@ def game_email(game, team, games):
         landing = fetch("gamecenter/" + str(game["id"]) + "/landing")
     except UserError:
         landing = None
-    return recap(game, team, landing, next_game({"games": games}))
+    standing = None
+    try:
+        table = standings(fetch("standings/now"))
+        standing = next((row | {"date": table["date"]} for row in table["teams"] if row["code"] == team), None)
+    except (UserError, ValueError, TypeError, AttributeError):
+        pass
+    return recap(game, team, landing, next_game({"games": games}), standing)
 
 
 def send_email(config, subject, body, before_send=None):
