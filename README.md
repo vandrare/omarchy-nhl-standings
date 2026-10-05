@@ -88,6 +88,9 @@ Save settings, then click **Send test email** to send the selected team's
 latest completed-game recap using the same subject and summary as automatic
 notifications. Both include the selected team’s current wins, losses, overtime losses, points,
 games played, and division/conference positions between the recap and next game.
+A full standings table for the selected team’s division follows its individual
+record, ordered by division rank with GP, W, L, OT, and PTS columns. An asterisk
+marks the selected team.
 The standings date is shown because NHL standings may take time to update after
 a final result; an unavailable feed is labeled without blocking the email.
 Both include the next scheduled matchup, local date and time,

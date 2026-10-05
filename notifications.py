@@ -227,7 +227,7 @@ def team_name(team):
     return " ".join(filter(None, [label(team.get("placeName")), label(team.get("commonName"))])) or team.get("abbrev", "Team")
 
 
-def recap(game, team, landing=None, upcoming=None, standing=None):
+def recap(game, team, landing=None, upcoming=None, standing=None, division_rows=None):
     home = game["homeTeam"]
     away = game["awayTeam"]
     ours, opponent = (home, away) if home["abbrev"] == team else (away, home)
@@ -272,6 +272,14 @@ def recap(game, team, landing=None, upcoming=None, standing=None):
             summary += "\n" + " · ".join(positions) + "."
     else:
         summary += ": Temporarily unavailable."
+    if standing and standing.get("division") and division_rows:
+        summary += "\n\n" + standing["division"] + " Division standings\n"
+        summary += "Rank | Team | GP | W | L | OT | PTS\n"
+        for row in division_rows:
+            selected = " *" if row["code"] == team else ""
+            rank = row.get("divisionRank") or "—"
+            summary += f"{rank} | {row['name'] or row['code']}{selected} | {row['gp']} | {row['w']} | {row['l']} | {row['ot']} | {row['pts']}\n"
+        summary += "* Selected team. GP: games played; OT: overtime losses; PTS: points."
     if upcoming:
         start = dt.datetime.fromisoformat(upcoming["start"]).astimezone()
         when = start.strftime("%a, %b %-d, %Y")
@@ -293,12 +301,16 @@ def game_email(game, team, games):
     except UserError:
         landing = None
     standing = None
+    division_rows = []
     try:
         table = standings(fetch("standings/now"))
         standing = next((row | {"date": table["date"]} for row in table["teams"] if row["code"] == team), None)
+        if standing and standing.get("division"):
+            division_rows = sorted((row for row in table["teams"] if row["division"] == standing["division"]),
+                                   key=lambda row: (row.get("divisionRank") or 999, -row["pts"]))
     except (UserError, ValueError, TypeError, AttributeError):
         pass
-    return recap(game, team, landing, next_game({"games": games}), standing)
+    return recap(game, team, landing, next_game({"games": games}), standing, division_rows)
 
 
 def send_email(config, subject, body, before_send=None):

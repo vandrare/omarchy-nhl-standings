@@ -44,3 +44,29 @@ class EmailStandingsTests(unittest.TestCase):
             _, body = n.game_email(game(), "VAN", [])
         self.assertIn("Current standings: Temporarily unavailable.", body)
         self.assertNotIn("99 wins", body)
+
+    def test_division_table_order_columns_and_placement(self):
+        table = self.data()
+        table["standings"][0].update(teamName={"default": "Vegas Golden Knights"}, divisionName="Pacific", divisionSequence=1, gamesPlayed=17, wins=12, losses=4, otLosses=1, points=25, date="2026-11-01")
+        table["standings"].append({"teamAbbrev": {"default": "COL"}, "teamName": {"default": "Colorado Avalanche"}, "divisionName": "Central", "divisionSequence": 1, "points": 30})
+        with patch.object(n, "fetch", side_effect=lambda endpoint: table if endpoint == "standings/now" else {}):
+            _, body = n.game_email(game(), "VAN", [])
+        self.assertIn("Rank | Team | GP | W | L | OT | PTS", body)
+        self.assertIn("1 | Vegas Golden Knights | 17 | 12 | 4 | 1 | 25", body)
+        self.assertIn("3 | Vancouver Canucks * | 17 | 10 | 5 | 2 | 22", body)
+        self.assertNotIn("Colorado Avalanche", body)
+        self.assertLess(body.index("1 | Vegas"), body.index("3 | Vancouver"))
+        self.assertLess(body.index("Current standings"), body.index("Pacific Division standings"))
+        self.assertLess(body.index("Pacific Division standings"), body.index("Next game:"))
+
+    def test_test_and_automatic_emails_include_same_division_table(self):
+        with patch.object(n, "season", return_value=[game()]):
+            n.save_settings(self.request)
+        latest = game(2)
+        table = self.data()
+        with patch.object(n, "season", return_value=[latest]), patch.object(n, "fetch", side_effect=lambda endpoint: table if endpoint == "standings/now" else {}), patch.object(n, "send_email") as send:
+            n.test_email()
+            n.check_results()
+        self.assertEqual(send.call_count, 2)
+        self.assertEqual(send.call_args_list[0].args[1:3], send.call_args_list[1].args[1:3])
+        self.assertIn("Pacific Division standings", send.call_args_list[0].args[2])
