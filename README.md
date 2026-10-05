@@ -91,6 +91,9 @@ games played, and division/conference positions between the recap and next game.
 A full standings table for the selected team’s division follows its individual
 record, ordered by division rank with GP, W, L, OT, and PTS columns. An asterisk
 marks the selected team.
+Emails include an HTML alternative with a fluid division table, wrapping team
+names, compact numeric columns, and a highlighted selected team. The same
+content is included as a plain-text fallback for clients that prefer text.
 The standings date is shown because NHL standings may take time to update after
 a final result; an unavailable feed is labeled without blocking the email.
 Both include the next scheduled matchup, local date and time,

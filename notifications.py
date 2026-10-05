@@ -20,6 +20,7 @@ import urllib.request
 import uuid
 
 from nhl import BASE, label, next_game, standings
+from email_html import render_email_html
 
 CONFIG = Path(os.environ.get("XDG_CONFIG_HOME", str(Path.home() / ".config"))) / "nhl-standings"
 STATE = Path(os.environ.get("XDG_STATE_HOME", str(Path.home() / ".local/state"))) / "nhl-standings"
@@ -324,6 +325,7 @@ def send_email(config, subject, body, before_send=None):
     message["Date"] = formatdate(localtime=True)
     message["Message-ID"] = make_msgid(domain="nhl-standings.local")
     message.set_content(body)
+    message.add_alternative(render_email_html(subject, body), subtype="html")
     try:
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=20, context=ssl.create_default_context()) as smtp:
             smtp.login(config["sender"], password)
